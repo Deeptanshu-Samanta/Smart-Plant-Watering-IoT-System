@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Plant Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='site.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}" />
+</head>
+<body>
+  <div class="bg">
+    <div class="bg__stars"></div>
+    <div class="bg__glow bg__glow--a"></div>
+    <div class="bg__glow bg__glow--b"></div>
+  </div>
+
+  <header class="nav">
+    <div class="nav__inner">
+      <a class="brand" href="/" aria-label="Smart Plant Watering home">
+        <span class="brand__mark"></span>
+        <span class="brand__text">Smart Plant Watering</span>
+      </a>
+      <nav class="nav__links" aria-label="Primary navigation">
+        <a href="/">Home</a>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+      </nav>
+      <div class="nav__cta">
+        <a class="btn btn--ghost" href="/">Landing</a>
+        <a class="btn btn--primary" href="{{ url_for('dashboard') }}">Refresh</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    {% set latest = latest if latest is defined else (data[0] if data else none) %}
+
+    <section class="dash__head">
+      <div>
+        <h1 class="dash__title">Dashboard</h1>
+        <div class="dash__meta">
+          <span id="statusPill" class="pill {{ 'pill--ok' if latest else 'pill--warn' }}">
+            <span class="pill__dot"></span>
+            <span data-role="status-label">{{ 'Live' if latest else 'No data' }}</span>
+          </span>
+          <span class="pill">
+            <span class="pill__dot" style="background: rgba(61,220,255,0.7)"></span>
+            <span>Last updated:</span>
+            <strong id="lastUpdated">{{ latest.timestamp if latest else '—' }}</strong>
+          </span>
+          <span class="pill">
+            <span class="pill__dot" style="background: rgba(255,255,255,0.25)"></span>
+            <span id="rowCount">{{ (data|length) if data else 0 }} shown</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="field">
+          <input id="searchInput" class="input" type="text" placeholder="Search readings…" autocomplete="off" />
+        </div>
+        <label class="toggle" for="autoRefreshToggle">
+          <input id="autoRefreshToggle" type="checkbox" checked />
+          <span>Auto refresh</span>
+        </label>
+      </div>
+    </section>
+
+    <section class="kpis" aria-label="Latest readings">
+      <div class="kpi">
+        <div class="kpi__label">Soil Moisture</div>
+        <div class="kpi__value" id="kpiSoil">{{ latest.soil_moisture if latest else '—' }}</div>
+        <div class="kpi__sub">Latest sensor value</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi__label">Temperature</div>
+        <div class="kpi__value" id="kpiTemp">
+          {% if latest %}{{ latest.temperature }}°C{% else %}—{% endif %}
+        </div>
+        <div class="kpi__sub">Ambient reading</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi__label">Humidity</div>
+        <div class="kpi__value" id="kpiHumidity">
+          {% if latest %}{{ latest.humidity }}%{% else %}—{% endif %}
+        </div>
+        <div class="kpi__sub">Air humidity</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi__label">Pump Status</div>
+        <div class="kpi__value">
+          <span id="kpiPump" class="badge {% if latest and latest.pump_status == 1 %}badge--on{% else %}badge--off{% endif %}">
+            {% if latest and latest.pump_status == 1 %}ON{% else %}OFF{% endif %}
+          </span>
+        </div>
+        <div class="kpi__sub">Current actuator state</div>
+      </div>
+    </section>
+
+    <section class="panel2" aria-label="Recent readings table">
+      <div class="panel2__head">
+        <div>
+          <h2>Recent readings</h2>
+          <div class="small">Newest first • shows last 20</div>
+        </div>
+        <div class="small">Updates every 5s</div>
+      </div>
+
+      <div id="emptyState" class="empty" {% if data %}hidden{% endif %}>
+        <strong>No sensor data yet.</strong>
+        <div class="empty__note">
+          Send data to <code class="code-pill">/update</code>
+          and refresh this page.
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Soil</th>
+            <th>Temp</th>
+            <th>Humidity</th>
+            <th>Pump</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody id="rowsBody">
+          {% if data %}
+            {% for row in data %}
+              <tr>
+                <td data-label="Soil">{{ row.soil_moisture }}</td>
+                <td data-label="Temp">{{ row.temperature }}°C</td>
+                <td data-label="Humidity">{{ row.humidity }}%</td>
+                <td data-label="Pump">
+                  <span class="badge {% if row.pump_status == 1 %}badge--on{% else %}badge--off{% endif %}">
+                    {% if row.pump_status == 1 %}ON{% else %}OFF{% endif %}
+                  </span>
+                </td>
+                <td class="td-muted" data-label="Time">{{ row.timestamp }}</td>
+              </tr>
+            {% endfor %}
+          {% endif %}
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <span>Smart Plant Watering</span>
+      <span class="footer__sep">•</span>
+      <span>Live dashboard + SQLite history</span>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+</body>
+</html>
