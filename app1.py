@@ -9,7 +9,7 @@ app = Flask(__name__)
 model2 = joblib.load("randomForest_plantWater.pkl")
 model1 = joblib.load("logistic_plantWater.pkl")
 
-API_KEY = "75d10256f63449e9bd7115124260102"
+API_KEY = "KEY"  //change while use
 CITY = "Kelambakkam"
 
 
