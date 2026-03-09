@@ -10,7 +10,7 @@ model_rf = joblib.load("randomForest_plantWater.pkl")
 model_lr = joblib.load("logistic_plantWater.pkl")
 
 # Weather API config
-API_KEY = "8a16f844a85643388cc163615260903"
+API_KEY = "KEY" //Enter your own key here
 CITY = "Kelambakkam"
 
 
