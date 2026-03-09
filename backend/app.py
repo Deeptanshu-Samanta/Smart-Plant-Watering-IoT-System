@@ -6,16 +6,22 @@ import os
 import joblib
 import requests
 
-app = Flask(__name__)
+# ---------------------------------------------------------------------------
+# Paths — project root is one level up from this file
+# ---------------------------------------------------------------------------
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+DB_PATH = os.path.join(BASE_DIR, "plant_data.db")
+
+app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 
 # ---------------------------------------------------------------------------
 # ML models (loaded once at startup)
 # ---------------------------------------------------------------------------
-MODEL_DIR = os.path.dirname(os.path.abspath(__file__))
-
 try:
-    model_rf = joblib.load(os.path.join(MODEL_DIR, "randomForest_plantWater.pkl"))
-    model_lr = joblib.load(os.path.join(MODEL_DIR, "logistic_plantWater.pkl"))
+    model_rf = joblib.load(os.path.join(BASE_DIR, "randomForest_plantWater.pkl"))
+    model_lr = joblib.load(os.path.join(BASE_DIR, "logistic_plantWater.pkl"))
     MODELS_LOADED = True
     print("✓ ML models loaded successfully")
 except Exception as e:
@@ -26,59 +32,53 @@ except Exception as e:
 # ---------------------------------------------------------------------------
 # Weather API config
 # ---------------------------------------------------------------------------
-API_KEY = "75d10256f63449e9bd7115124260102"
-CITY = "Kelambakkam"
+API_KEY = "8a16f844a85643388cc163615260903"
+CITY = "Kelambakkam"  
 
 
-def get_weather():
-    """Fetch current weather from WeatherAPI. Falls back to defaults on error."""
+def get_weather(city=None):
+    """Fetch pressure & wind from WeatherAPI. air_temp/air_humidity come from ESP32 sensors."""
+    q = city or CITY
     try:
-        url = f"http://api.weatherapi.com/v1/current.json?key={API_KEY}&q={CITY}"
-        response = requests.get(url, timeout=5)
-        data = response.json()
+        url = f"http://api.weatherapi.com/v1/current.json?key={API_KEY}&q={q}"
+        res = requests.get(url, timeout=5).json()
         return {
-            "air_temp": float(data["current"]["temp_c"]),
-            "air_humidity": float(data["current"]["humidity"]),
-            "pressure": float(data["current"]["pressure_mb"]) / 10,
-            "wind_speed": float(data["current"]["wind_kph"]),
-            "wind_gust": float(data["current"]["gust_kph"]),
+            "pressure": res["current"]["pressure_mb"] / 10,
+            "wind_speed": res["current"]["wind_kph"],
+            "wind_gust": res["current"]["gust_kph"],
         }
     except Exception as e:
-        print("Weather API Error:", e)
+        print("Weather API error:", e)
         return {
-            "air_temp": 30.0,
-            "air_humidity": 50.0,
-            "pressure": 101.0,
-            "wind_speed": 5.0,
-            "wind_gust": 8.0,
+            "pressure": 101,
+            "wind_speed": 5,
+            "wind_gust": 7,
         }
 
 
 def decide(data):
     """Run ML models + rule-based overrides to decide pump ON(1) / OFF(0)."""
     input_data = [[
-        float(data["soil_moisture"]),
-        30.0,  # placeholder soil temp
-        float(data["soil_moisture"]),
-        float(datetime.datetime.now().hour),
-        float(data["air_temp"]),
-        float(data["wind_speed"]),
-        float(data["air_humidity"]),
-        float(data["wind_gust"]),
-        float(data["pressure"]),
+        data["soil_moisture"],
+        data["soil_temp"],
+        data["air_humidity"],
+        datetime.datetime.now().hour,
+        data["air_temp"],
+        data["wind_speed"],
+        data["air_humidity"],
+        data["wind_gust"],
+        data["pressure"],
     ]]
 
     rf = model_rf.predict(input_data)[0]
     lr = model_lr.predict(input_data)[0]
 
-    # Rule-based overrides
-    if data["soil_moisture"] < 20 and data["air_humidity"] < 30:
+    # Safety rules
+    if data["soil_moisture"] < 20:
         return 1
-    if data["soil_moisture"] > 65:
+    if data["soil_moisture"] > 70:
         return 0
-
-    hour = datetime.datetime.now().hour
-    if hour < 5 or hour > 20:
+    if datetime.datetime.now().hour < 5 or datetime.datetime.now().hour > 20:
         return 0
 
     return int(rf or lr)
@@ -88,7 +88,7 @@ def decide(data):
 # Database
 # ---------------------------------------------------------------------------
 def init_db():
-    conn = sqlite3.connect("plant_data.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute('''
         CREATE TABLE IF NOT EXISTS sensor_data (
@@ -108,7 +108,7 @@ init_db()
 
 def fetch_recent(limit: int = 20):
     limit = max(1, min(int(limit), 200))
-    conn = sqlite3.connect("plant_data.db")
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
     c.execute("SELECT * FROM sensor_data ORDER BY id DESC LIMIT ?", (limit,))
@@ -129,7 +129,7 @@ def landing():
 @app.route('/dashboard')
 def dashboard():
     rows, latest = fetch_recent(20)
-    return render_template("dashboard.html", data=rows, latest=latest)
+    return render_template("dashboard.html", data=rows, latest=latest, city=CITY)
 
 
 # ---------------------------------------------------------------------------
@@ -143,7 +143,7 @@ def update_data():
     if missing:
         return jsonify({"error": f"Missing keys: {', '.join(missing)}"}), 400
 
-    conn = sqlite3.connect("plant_data.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute(
         "INSERT INTO sensor_data (soil_moisture, temperature, humidity, pump_status, timestamp) VALUES (?, ?, ?, ?, ?)",
@@ -167,6 +167,26 @@ def api_recent():
 
 
 # ---------------------------------------------------------------------------
+# City configuration API
+# ---------------------------------------------------------------------------
+@app.route('/set_city', methods=['POST'])
+def set_city():
+    global CITY
+    body = request.get_json(silent=True) or {}
+    new_city = body.get('city', '').strip()
+    if not new_city:
+        return jsonify({"error": "City name is required"}), 400
+    CITY = new_city
+    print(f"City updated to: {CITY}")
+    return jsonify({"message": f"City set to {CITY}", "city": CITY})
+
+
+@app.route('/get_city')
+def get_city():
+    return jsonify({"city": CITY})
+
+
+# ---------------------------------------------------------------------------
 # ML prediction API  (ESP32 → server)
 # ---------------------------------------------------------------------------
 @app.route("/predict", methods=["POST"])
@@ -178,14 +198,38 @@ def predict():
     if not soil_data or "soil_moisture" not in soil_data:
         return jsonify({"error": "Invalid data"}), 400
 
-    print("Received from ESP32:", soil_data)
+    print("\nReceived from ESP32:", soil_data)
 
     weather = get_weather()
     combined = {**soil_data, **weather}
+
+    print("Combined Data:", combined)
+
     decision = decide(combined)
 
-    print("Final Input:", combined)
     print("Decision:", decision)
+
+    # ---- persist every prediction so the dashboard updates in real-time ----
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute(
+            "INSERT INTO sensor_data "
+            "(soil_moisture, temperature, humidity, pump_status, timestamp) "
+            "VALUES (?, ?, ?, ?, ?)",
+            (
+                float(soil_data["soil_moisture"]),
+                float(soil_data.get("air_temp", 0)),       # from ESP32 DHT22
+                float(soil_data.get("air_humidity", 0)),   # from ESP32 DHT22
+                int(decision),
+                datetime.datetime.now().isoformat(timespec="seconds"),
+            ),
+        )
+        conn.commit()
+        conn.close()
+        print("✓ Prediction logged to DB")
+    except Exception as db_err:
+        print(f"⚠ DB insert failed: {db_err}")
 
     return jsonify({"decision": int(decision)})
 
