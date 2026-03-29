@@ -3,33 +3,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Smart Plant Dashboard</title>
+  <title>PlantOS — Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='site.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}" />
 </head>
 <body>
   <div class="bg">
-    <div class="bg__stars"></div>
+    <div class="bg__grid"></div>
     <div class="bg__glow bg__glow--a"></div>
     <div class="bg__glow bg__glow--b"></div>
+    <div class="bg__glow bg__glow--c"></div>
   </div>
 
   <header class="nav">
     <div class="nav__inner">
-      <a class="brand" href="/" aria-label="Smart Plant Watering home">
-        <span class="brand__mark">&#127793;</span>
-        <span class="brand__text">Smart Plant Watering</span>
+      <a class="brand" href="/">
+        <span class="brand__mark">
+          <svg class="brand__leaf" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2C6 2 3 8 3 14c0 4 2.5 7 6 8 0-4 1-7 3-9-1 3-1 6 0 9 3.5-1 6-4.5 6-8 0-6-3-12-6-12z" fill="rgba(0,0,0,0.85)"/>
+          </svg>
+        </span>
+        <span class="brand__text">PlantOS</span>
       </a>
-      <nav class="nav__links" aria-label="Primary navigation">
+      <nav class="nav__links">
         <a href="/">Home</a>
-        <a href="{{ url_for('dashboard') }}" class="nav__active">Dashboard</a>
+        <a href="/dashboard" class="active">Dashboard</a>
       </nav>
       <div class="nav__cta">
         <a class="btn btn--ghost" href="/">Landing</a>
-        <a class="btn btn--primary" href="{{ url_for('dashboard') }}">Refresh</a>
+        <a class="btn btn--primary" href="/dashboard">&#8635; Refresh</a>
       </div>
     </div>
   </header>
@@ -37,40 +42,30 @@
   <main class="container">
     {% set latest = latest if latest is defined else (data[0] if data else none) %}
 
-    <section class="dash__head">
+    <section class="dash__head anim anim-1">
       <div>
-        <h1 class="dash__title">Dashboard</h1>
+        <h1 class="dash__title">Live Dashboard</h1>
         <div class="dash__meta">
           <span id="statusPill" class="pill {{ 'pill--ok' if latest else 'pill--warn' }}">
             <span class="pill__dot"></span>
             <span data-role="status-label">{{ 'Live' if latest else 'No data' }}</span>
           </span>
           <span class="pill">
-            <span class="pill__dot" style="background: rgba(61,220,255,0.7)"></span>
-            <span>Last updated:</span>
-            <strong id="lastUpdated">{{ latest.timestamp if latest else '—' }}</strong>
+            <span class="pill__dot" style="background:rgba(0,229,255,0.7)"></span>
+            Updated: <strong id="lastUpdated">{{ latest.timestamp if latest else '---' }}</strong>
           </span>
           <span class="pill">
-            <span class="pill__dot" style="background: rgba(255,255,255,0.25)"></span>
-            <span id="rowCount">{{ (data|length) if data else 0 }} shown</span>
+            <span class="pill__dot"></span>
+            <span id="rowCount">{{ (data|length) if data else 0 }} events</span>
+          </span>
+          <span class="pill pill--ml">
+            <span class="pill__dot" style="background:rgba(0,229,255,0.8)"></span>
+            ML active
           </span>
         </div>
       </div>
-
       <div class="controls">
-        <form id="cityForm" class="city-form" onsubmit="return false;">
-          <div class="field">
-            <input id="cityInput" class="input input--city" type="text" placeholder="Enter city name..." value="{{ city }}" autocomplete="off" />
-          </div>
-          <button id="cityBtn" class="btn btn--primary btn--sm" type="submit">Set City</button>
-          <span id="cityStatus" class="pill pill--city" hidden>
-            <span class="pill__dot" style="background:var(--accent)"></span>
-            <span id="cityLabel">{{ city }}</span>
-          </span>
-        </form>
-        <div class="field">
-          <input id="searchInput" class="input" type="text" placeholder="Search readings..." autocomplete="off" />
-        </div>
+        <input id="searchInput" class="input" type="text" placeholder="Search events..." autocomplete="off" />
         <label class="toggle" for="autoRefreshToggle">
           <input id="autoRefreshToggle" type="checkbox" checked />
           <span>Auto refresh</span>
@@ -78,74 +73,69 @@
       </div>
     </section>
 
-    <section class="city-banner" id="cityBanner">
-      <div class="city-banner__icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-      </div>
-      <div class="city-banner__text">
-        <span class="city-banner__label">Weather Location</span>
-        <span class="city-banner__name" id="cityBannerName">{{ city }}</span>
-      </div>
-    </section>
-
-    <section class="kpis" aria-label="Latest readings">
-      <div class="kpi kpi--soil">
-        <div class="kpi__icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>
-        </div>
+    <section class="kpis anim anim-2" aria-label="Latest readings">
+      <div class="kpi">
         <div class="kpi__label">Soil Moisture</div>
-        <div class="kpi__value" id="kpiSoil">{{ latest.soil_moisture if latest else '—' }}</div>
-        <div class="kpi__sub">Latest sensor value</div>
+        <div class="kpi__value" id="kpiSoil" style="color:var(--accent)">{{ latest.soil_moisture if latest else '---' }}</div>
+        <div class="kpi__sub">Latest reading</div>
       </div>
-      <div class="kpi kpi--temp">
-        <div class="kpi__icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
-        </div>
+      <div class="kpi">
         <div class="kpi__label">Temperature</div>
-        <div class="kpi__value" id="kpiTemp">
-          {% if latest %}{{ latest.temperature }}&deg;C{% else %}&mdash;{% endif %}
-        </div>
-        <div class="kpi__sub">Ambient reading</div>
+        <div class="kpi__value" id="kpiTemp">{% if latest %}{{ latest.temperature }}C{% else %}---{% endif %}</div>
+        <div class="kpi__sub">Ambient</div>
       </div>
-      <div class="kpi kpi--humidity">
-        <div class="kpi__icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
-        </div>
+      <div class="kpi">
         <div class="kpi__label">Humidity</div>
-        <div class="kpi__value" id="kpiHumidity">
-          {% if latest %}{{ latest.humidity }}%{% else %}&mdash;{% endif %}
-        </div>
+        <div class="kpi__value" id="kpiHumidity">{% if latest %}{{ latest.humidity }}%{% else %}---{% endif %}</div>
         <div class="kpi__sub">Air humidity</div>
       </div>
-      <div class="kpi kpi--pump">
-        <div class="kpi__icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m8.66-13.5-5.2 3m-6.92 4-5.2 3m0-10 5.2 3m6.92 4 5.2 3"/></svg>
-        </div>
+      <div class="kpi">
         <div class="kpi__label">Pump Status</div>
-        <div class="kpi__value">
+        <div class="kpi__value" style="font-size:20px;padding-top:4px">
           <span id="kpiPump" class="badge {% if latest and latest.pump_status == 1 %}badge--on{% else %}badge--off{% endif %}">
             {% if latest and latest.pump_status == 1 %}ON{% else %}OFF{% endif %}
           </span>
         </div>
-        <div class="kpi__sub">Current actuator state</div>
+        <div class="kpi__sub">ML-controlled</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi__label">Last Session</div>
+        <div class="kpi__value" id="kpiDuration" style="color:var(--accent2)">
+          {% if latest and latest.duration_seconds and latest.duration_seconds > 0 %}
+            {% set s = latest.duration_seconds %}
+            {% if s < 60 %}{{ s }}s{% else %}{{ (s // 60) }}m {{ (s % 60) }}s{% endif %}
+          {% else %}---{% endif %}
+        </div>
+        <div class="kpi__sub">Pump ON duration</div>
       </div>
     </section>
 
-    <section class="panel2" aria-label="Recent readings table">
+    <section class="panel2 anim anim-3">
       <div class="panel2__head">
         <div>
-          <h2>Recent readings</h2>
-          <div class="small">Newest first &bull; shows last 20</div>
+          <h2>Pump event timeline</h2>
+          <div class="small">Green = ON &nbsp;|&nbsp; Red = OFF &nbsp;|&nbsp; Each bar is a state change</div>
         </div>
-        <div class="small">Updates every 5s</div>
+        <div class="small">Last 20 events</div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="pumpChart"></canvas>
+      </div>
+    </section>
+
+    <section class="panel2 anim anim-4">
+      <div class="panel2__head">
+        <div>
+          <h2>State change events</h2>
+          <div class="small">Only logs when pump flips ON to OFF or OFF to ON</div>
+        </div>
+        <div class="small">Newest first</div>
       </div>
 
       <div id="emptyState" class="empty" {% if data %}hidden{% endif %}>
-        <div class="empty__icon">&#128269;</div>
-        <strong>No sensor data yet.</strong>
+        <strong>No pump events yet.</strong>
         <div class="empty__note">
-          Send data to <code class="code-pill">/update</code>
-          and refresh this page.
+          Send sensor data to <code class="code-pill">/update</code> and rows appear only when pump state changes.
         </div>
       </div>
 
@@ -156,6 +146,8 @@
             <th>Temp</th>
             <th>Humidity</th>
             <th>Pump</th>
+            <th>Reason</th>
+            <th>Duration</th>
             <th>Time</th>
           </tr>
         </thead>
@@ -164,12 +156,19 @@
             {% for row in data %}
               <tr>
                 <td data-label="Soil">{{ row.soil_moisture }}</td>
-                <td data-label="Temp">{{ row.temperature }}&deg;C</td>
+                <td data-label="Temp">{{ row.temperature }}C</td>
                 <td data-label="Humidity">{{ row.humidity }}%</td>
                 <td data-label="Pump">
                   <span class="badge {% if row.pump_status == 1 %}badge--on{% else %}badge--off{% endif %}">
                     {% if row.pump_status == 1 %}ON{% else %}OFF{% endif %}
                   </span>
+                </td>
+                <td data-label="Reason" class="td-reason">{{ row.reason or '---' }}</td>
+                <td data-label="Duration" class="td-muted">
+                  {% if row.duration_seconds and row.duration_seconds > 0 %}
+                    {% set s = row.duration_seconds %}
+                    {% if s < 60 %}{{ s }}s{% else %}{{ (s // 60) }}m {{ (s % 60) }}s{% endif %}
+                  {% else %}---{% endif %}
                 </td>
                 <td class="td-muted" data-label="Time">{{ row.timestamp }}</td>
               </tr>
@@ -182,12 +181,16 @@
 
   <footer class="footer">
     <div class="footer__inner">
-      <span>&#127793; Smart Plant Watering</span>
-      <span class="footer__sep">&bull;</span>
-      <span>Live dashboard + SQLite history</span>
+      <div class="footer__dot"></div>
+      <span>PlantOS</span>
+      <span class="footer__sep">|</span>
+      <span>ML-powered event-driven irrigation</span>
+      <span class="footer__sep">|</span>
+      <span>SQLite history</span>
     </div>
   </footer>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
 </body>
 </html>
