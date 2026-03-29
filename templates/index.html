@@ -3,194 +3,229 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Smart Plant Watering</title>
+  <title>Smart Plant Watering — IoT Automation</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='site.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}" />
 </head>
 <body>
   <div class="bg">
-    <div class="bg__stars"></div>
+    <div class="bg__grid"></div>
     <div class="bg__glow bg__glow--a"></div>
     <div class="bg__glow bg__glow--b"></div>
+    <div class="bg__glow bg__glow--c"></div>
+    <div class="bg__orb bg__orb--1"></div>
+    <div class="bg__orb bg__orb--2"></div>
   </div>
 
   <header class="nav">
     <div class="nav__inner">
-      <a class="brand" href="/" aria-label="Smart Plant Watering home">
-        <span class="brand__mark">&#127793;</span>
-        <span class="brand__text">Smart Plant Watering</span>
+      <a class="brand" href="#top">
+        <span class="brand__mark">
+          <svg class="brand__leaf" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2C6 2 3 8 3 14c0 4 2.5 7 6 8 0-4 1-7 3-9-1 3-1 6 0 9 3.5-1 6-4.5 6-8 0-6-3-12-6-12z" fill="rgba(0,0,0,0.85)"/>
+          </svg>
+        </span>
+        <span class="brand__text">PlantOS</span>
       </a>
-      <nav class="nav__links" aria-label="Primary navigation">
+      <nav class="nav__links">
         <a href="#features">Features</a>
         <a href="#how">How it works</a>
         <a href="#about">About</a>
       </nav>
       <div class="nav__cta">
-        <a class="btn btn--ghost" href="{{ url_for('dashboard') }}">Dashboard</a>
-        <a class="btn btn--primary" href="#get-started">Get started</a>
+        <a class="btn btn--ghost" href="/dashboard">Dashboard</a>
+        <a class="btn btn--primary" href="#get-started">Get started →</a>
       </div>
     </div>
   </header>
 
-  <main id="top" class="container main">
+  <main id="top" class="container">
+
+    <!-- HERO -->
     <section class="hero">
       <div class="hero__content">
-        <p class="eyebrow">IoT + Automation</p>
-        <h1>
-          Keep plants healthy with
-          <span class="accent">smart watering</span>.
-        </h1>
-        <p class="subhead">
-          Monitor soil moisture, temperature, and humidity in real time and automate irrigation
-          with data-driven control.
-        </p>
-        <div class="hero__actions">
-          <a class="btn btn--primary btn--lg" href="{{ url_for('dashboard') }}">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-            Open dashboard
-          </a>
-          <a class="btn btn--ghost btn--lg" href="#features">Explore features</a>
+        <div class="eyebrow anim anim-1">
+          <span class="eyebrow__line"></span>
+          <span class="eyebrow__dot"></span>
+          IoT + Machine Learning
         </div>
-
-        <div class="hero__stats" role="list" aria-label="Highlights">
-          <div class="stat" role="listitem">
-            <div class="stat__icon">&#9889;</div>
+        <h1 class="anim anim-2">
+          Plants that know<br>when they're
+          <span class="accent">thirsty</span>.
+        </h1>
+        <p class="subhead anim anim-3">
+          Soil sensors, real-time monitoring, and a Random Forest model
+          that decides exactly when your pump turns on — no guesswork, no waste.
+        </p>
+        <div class="hero__actions anim anim-4">
+          <a class="btn btn--primary" href="/dashboard">Open dashboard →</a>
+          <a class="btn btn--ghost" href="#features">Explore features</a>
+        </div>
+        <div class="hero__stats anim anim-5">
+          <div class="stat">
             <div class="stat__kpi">Real-time</div>
-            <div class="stat__label">Sensor updates</div>
+            <div class="stat__label">Sensor polling</div>
           </div>
-          <div class="stat" role="listitem">
-            <div class="stat__icon">&#128167;</div>
-            <div class="stat__kpi">Auto</div>
-            <div class="stat__label">Pump control</div>
+          <div class="stat">
+            <div class="stat__kpi">ML-driven</div>
+            <div class="stat__label">Pump decisions</div>
           </div>
-          <div class="stat" role="listitem">
-            <div class="stat__icon">&#128200;</div>
-            <div class="stat__kpi">History</div>
-            <div class="stat__label">Data logging</div>
+          <div class="stat">
+            <div class="stat__kpi">Event log</div>
+            <div class="stat__label">Every state change</div>
           </div>
         </div>
       </div>
 
-      <div class="hero__visual" aria-hidden="true">
-        <div class="orb orb--outer"></div>
-        <div class="orb orb--inner"></div>
-        <div class="hero__plant">&#127807;</div>
-        <div class="chip">
-          <div class="chip__row">
-            <span class="chip__dot chip__dot--pulse"></span>
-            <span class="chip__title">Live signal</span>
+      <div class="hero__visual anim anim-3">
+        <div class="visual__card visual__card--main">
+          <div class="vc__top">
+            <div class="vc__dots">
+              <div class="vc__dot vc__dot--r"></div>
+              <div class="vc__dot vc__dot--y"></div>
+              <div class="vc__dot vc__dot--g"></div>
+            </div>
+            <span class="vc__title">LIVE SENSOR FEED</span>
+            <div class="vc__badge">
+              <div class="vc__badge__dot"></div>
+              Active
+            </div>
           </div>
-          <div class="chip__meter">
-            <span style="width: 72%"></span>
+          <div class="vc__body">
+            <div class="wave">
+              <span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span>
+            </div>
+            <div class="mini-grid">
+              <div class="mini-card">
+                <div class="mini-card__label">Soil Moisture</div>
+                <div class="mini-card__value" style="color: var(--accent);">24%</div>
+              </div>
+              <div class="mini-card">
+                <div class="mini-card__label">Temperature</div>
+                <div class="mini-card__value">32.4°C</div>
+              </div>
+              <div class="mini-card">
+                <div class="mini-card__label">Humidity</div>
+                <div class="mini-card__value">61%</div>
+              </div>
+              <div class="mini-card">
+                <div class="mini-card__label">Pump</div>
+                <div class="mini-card__value" style="color: var(--accent);">ON ●</div>
+              </div>
+            </div>
           </div>
-          <div class="chip__grid">
-            <div class="chip__card">
-              <div class="chip__label">Soil</div>
-              <div class="chip__value">Moisture</div>
+        </div>
+        <div class="visual__card visual__card--float">
+          <div class="float-row">
+            <div class="float-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2C6 2 3 8 3 14c0 4 2.5 7 6 8 0-4 1-7 3-9-1 3-1 6 0 9 3.5-1 6-4.5 6-8 0-6-3-12-6-12z" fill="var(--accent)" opacity="0.85"/>
+              </svg>
             </div>
-            <div class="chip__card">
-              <div class="chip__label">Temp</div>
-              <div class="chip__value">Ambient</div>
+            <div class="float-text">
+              <div class="float-text__label">ML Model Decision</div>
+              <div class="float-text__value">Pump ON</div>
             </div>
-            <div class="chip__card">
-              <div class="chip__label">Humidity</div>
-              <div class="chip__value">Air</div>
-            </div>
-            <div class="chip__card">
-              <div class="chip__label">Pump</div>
-              <div class="chip__value">Control</div>
+            <div class="float-stats">
+              <div class="fstat">
+                <div class="fstat__v" style="color:var(--accent)">24%</div>
+                <div class="fstat__l">Soil</div>
+              </div>
+              <div class="fstat">
+                <div class="fstat__v">4m 12s</div>
+                <div class="fstat__l">Duration</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- FEATURES -->
     <section id="features" class="section">
       <div class="section__head">
         <div>
-          <p class="eyebrow">Capabilities</p>
-          <h2>Why smart watering?</h2>
+          <div class="section__eyebrow">Capabilities</div>
+          <h2>Built for precision.</h2>
+          <p class="section__sub">Every component designed to give your plants exactly what they need, when they need it.</p>
         </div>
-        <p>Less guesswork, healthier plants, and efficient water use.</p>
       </div>
-      <div class="grid grid--4">
-        <div class="feature">
-          <div class="feature__icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
-          </div>
-          <h3>Automation</h3>
-          <p>Trigger watering based on moisture thresholds and pump state.</p>
+      <div class="features">
+        <div class="feature anim anim-1">
+          <div class="feature__icon">🧠</div>
+          <h3>ML Decisions</h3>
+          <p>Random Forest model trained on real plant data decides when the pump turns on — not just a threshold.</p>
         </div>
-        <div class="feature">
-          <div class="feature__icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-          </div>
-          <h3>Monitoring</h3>
-          <p>See soil moisture, temperature, and humidity in one place.</p>
+        <div class="feature anim anim-2">
+          <div class="feature__icon">📡</div>
+          <h3>Live Monitoring</h3>
+          <p>Soil moisture, temperature, and humidity streamed to your dashboard in real time via HTTP API.</p>
         </div>
-        <div class="feature">
-          <div class="feature__icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          </div>
-          <h3>Logging</h3>
-          <p>Store readings with timestamps for trends and analysis.</p>
+        <div class="feature anim anim-3">
+          <div class="feature__icon">⚡</div>
+          <h3>Event Logging</h3>
+          <p>Only saves data when the pump state changes — a clean, meaningful event log instead of noise.</p>
         </div>
-        <div class="feature">
-          <div class="feature__icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          </div>
-          <h3>Clarity</h3>
-          <p>Simple dashboards designed for quick decisions.</p>
+        <div class="feature anim anim-4">
+          <div class="feature__icon">📊</div>
+          <h3>Visual Timeline</h3>
+          <p>Interactive chart showing every pump ON/OFF event with duration and ML reasoning attached.</p>
         </div>
       </div>
     </section>
 
-    <section id="how" class="section section--split">
-      <div class="split">
-        <div class="split__text">
-          <p class="eyebrow">Process</p>
-          <h2>How it works</h2>
-          <p>
-            Sensors send readings to your server, the system stores them, and you can review recent
-            history anytime in the dashboard.
-          </p>
+    <!-- HOW IT WORKS -->
+    <section id="how" class="section">
+      <div class="how">
+        <div class="how__text">
+          <div class="section__eyebrow">Process</div>
+          <h2>How it works.</h2>
+          <p class="section__sub" style="margin-bottom:0">From sensor to action in milliseconds.</p>
           <ol class="steps">
             <li>
               <span class="steps__n">1</span>
               <div>
-                <div class="steps__t">Collect</div>
-                <div class="steps__d">Soil moisture, temperature, humidity, and pump status.</div>
+                <div class="steps__t">Sense</div>
+                <div class="steps__d">ESP32 reads soil moisture, temperature, and humidity and POSTs to the Flask server.</div>
               </div>
             </li>
             <li>
               <span class="steps__n">2</span>
               <div>
-                <div class="steps__t">Store</div>
-                <div class="steps__d">Save readings in a local SQLite database with timestamps.</div>
+                <div class="steps__t">Predict</div>
+                <div class="steps__d">Random Forest model evaluates all sensor values and predicts whether the pump should be ON or OFF.</div>
               </div>
             </li>
             <li>
               <span class="steps__n">3</span>
               <div>
+                <div class="steps__t">Log</div>
+                <div class="steps__d">Only when the pump state changes, the event is saved with a reason, timestamp, and duration.</div>
+              </div>
+            </li>
+            <li>
+              <span class="steps__n">4</span>
+              <div>
                 <div class="steps__t">Visualize</div>
-                <div class="steps__d">Open the dashboard to view the latest values and recent history.</div>
+                <div class="steps__d">Dashboard shows live KPIs, event timeline chart, and the full state change history.</div>
               </div>
             </li>
           </ol>
-          <div class="inline-actions" id="get-started">
-            <a class="btn btn--primary" href="{{ url_for('dashboard') }}">View dashboard</a>
+          <div class="hero__actions" id="get-started" style="margin-top:24px; margin-bottom:0">
+            <a class="btn btn--primary" href="/dashboard">View dashboard →</a>
             <a class="btn btn--ghost" href="#about">Learn more</a>
           </div>
         </div>
-        <div class="split__visual" aria-hidden="true">
+        <div class="how__visual">
           <div class="panel">
             <div class="panel__top">
-              <div class="panel__pill panel__pill--red"></div>
-              <div class="panel__pill panel__pill--yellow"></div>
-              <div class="panel__pill panel__pill--green"></div>
+              <div class="panel__dot"></div>
+              <div class="panel__dot"></div>
+              <div class="panel__dot"></div>
             </div>
             <div class="panel__body">
               <div class="wave">
@@ -199,15 +234,15 @@
               <div class="panel__chips">
                 <div class="mini">
                   <div class="mini__k">Soil</div>
-                  <div class="mini__v">Moisture</div>
+                  <div class="mini__v" style="color:var(--accent)">24%</div>
                 </div>
                 <div class="mini">
                   <div class="mini__k">Pump</div>
-                  <div class="mini__v">On/Off</div>
+                  <div class="mini__v" style="color:var(--accent)">ON</div>
                 </div>
                 <div class="mini">
                   <div class="mini__k">Temp</div>
-                  <div class="mini__v">Celsius</div>
+                  <div class="mini__v">32°C</div>
                 </div>
               </div>
             </div>
@@ -216,36 +251,40 @@
       </div>
     </section>
 
-    <section id="about" class="section section--cta">
+    <!-- CTA -->
+    <section id="about" class="cta-section">
       <div class="cta">
         <div class="cta__text">
-          <h2>Ready to see your plant data?</h2>
-          <p>Open the dashboard to view the latest readings and the most recent history.</p>
+          <h2>Ready to watch your plant data?</h2>
+          <p>Open the dashboard to see live sensor readings, pump events, and the ML model in action.</p>
         </div>
         <div class="cta__actions">
-          <a class="btn btn--primary btn--lg" href="{{ url_for('dashboard') }}">Open dashboard</a>
-          <a class="btn btn--ghost btn--lg" href="#top">Back to top</a>
+          <a class="btn btn--primary" href="/dashboard">Open dashboard →</a>
+          <a class="btn btn--ghost" href="#top">Back to top</a>
         </div>
       </div>
     </section>
+
   </main>
 
   <footer class="footer">
     <div class="footer__inner">
-      <span>&#127793; Smart Plant Watering</span>
-      <span class="footer__sep">&bull;</span>
-      <span>Local dashboard + API data logging</span>
+      <div class="footer__dot"></div>
+      <span>PlantOS</span>
+      <span class="footer__sep">•</span>
+      <span>ML-powered smart irrigation</span>
+      <span class="footer__sep">•</span>
+      <span>SQLite + Flask + Random Forest</span>
     </div>
   </footer>
 
   <script>
-    document.querySelectorAll('a[href^="#"]').forEach((a) => {
-      a.addEventListener("click", (e) => {
-        const id = a.getAttribute("href");
-        const el = document.querySelector(id);
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const el = document.querySelector(a.getAttribute('href'));
         if (!el) return;
         e.preventDefault();
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     });
   </script>
